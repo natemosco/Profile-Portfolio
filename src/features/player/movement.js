@@ -1,5 +1,5 @@
 import { store } from "../../reducers/index";
-import { SPRITE_SIZE } from "../../reducers/constants";
+import { SPRITE_SIZE, MAP_WIDTH, MAP_HEIGHT } from "../../reducers/constants";
 export default function handleMovement(player) {
   function getNewPosition(direction) {
     const oldPos = store.getState().player.position;
@@ -13,11 +13,20 @@ export default function handleMovement(player) {
       return [oldPos[0], oldPos[1] + SPRITE_SIZE];
     }
   }
+  function observeBoundaries(oldPos, newPos) {
+    return newPos[0] >= 0 &&
+      newPos <= MAP_WIDTH - SPRITE_SIZE &&
+      newPos[1] >= 0 &&
+      newPos[1] <= MAP_HEIGHT - SPRITE_SIZE
+      ? newPos
+      : oldPos;
+  }
   function dispatchMove(direction) {
+    const oldPos = store.getState().player.position;
     store.dispatch({
       type: "MOVE_PLAYER",
       payload: {
-        position: getNewPosition(direction)
+        position: observeBoundaries(oldPos, getNewPosition(direction))
       }
     });
   }
